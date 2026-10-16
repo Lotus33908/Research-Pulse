@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Pulse</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#ffffff; --panel:#ffffff; --fg:#111111; --fg2:#4d4d4d; --muted:#8a8a8a; --line:#e6e6e6; --line2:#cfcfcf; --hover:#f6f6f6;
+  --q1:#141414; --q2:#4b4b4b; --q3:#808080; --q4:#b0b0b0; --unr:#e2e2e2; --na:#f1f1f1; --onq3:#ffffff; --onq4:#111111;
+  --accent:#111111;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111111; --panel:#111111; --fg:#f2f2f2; --fg2:#bdbdbd; --muted:#8a8a8a; --line:#2a2a2a; --line2:#3a3a3a; --hover:#1a1a1a;
+    --q1:#f2f2f2; --q2:#bdbdbd; --q3:#8a8a8a; --q4:#5a5a5a; --unr:#2f2f2f; --na:#222222; --onq3:#111111; --onq4:#f2f2f2;
+    --accent:#f2f2f2;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111111; --panel:#111111; --fg:#f2f2f2; --fg2:#bdbdbd; --muted:#8a8a8a; --line:#2a2a2a; --line2:#3a3a3a; --hover:#1a1a1a;
+  --q1:#f2f2f2; --q2:#bdbdbd; --q3:#8a8a8a; --q4:#5a5a5a; --unr:#2f2f2f; --na:#222222; --onq3:#111111; --onq4:#f2f2f2;
+  --accent:#f2f2f2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line2)}
+a:hover{border-bottom-color:var(--fg)}
+button,select,input{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+/* header */
+header{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.bar{display:flex;align-items:center;gap:28px;height:56px}
+.brand{font-weight:650;letter-spacing:.02em;white-space:nowrap}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;line-height:1}
+nav{display:flex;gap:4px;height:100%}
+nav a{border:0;display:flex;align-items:center;padding:0 12px;color:var(--fg2);border-bottom:2px solid transparent;margin-bottom:-1px}
+nav a.on{color:var(--fg);border-bottom-color:var(--fg)}
+nav a:hover{color:var(--fg)}
+.search{margin-left:auto;position:relative;width:min(360px,40vw)}
+.search input{width:100%;border:1px solid var(--line2);background:var(--bg);border-radius:6px;padding:7px 34px 7px 12px;outline:none}
+.search input:focus{border-color:var(--fg)}
+.search kbd{position:absolute;right:9px;top:8px;font:11px system-ui;color:var(--muted);border:1px solid var(--line2);border-radius:4px;padding:0 5px}
+.dd{position:absolute;top:38px;left:0;right:0;background:var(--bg);border:1px solid var(--line2);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.08);display:none;max-height:360px;overflow:auto;z-index:9}
+.dd.open{display:block}
+.dd div{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
+.dd div:hover,.dd div.hi{background:var(--hover)}
+.dd small{color:var(--muted)}
+.theme{border:0;background:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px}
+.theme:hover{color:var(--fg)}
+/* layout */
+main{padding:28px 0 60px}
+h1{font-size:26px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg2);margin:0 0 12px}
+.sub{color:var(--muted)}
+.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.sec{margin-top:32px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}
+@media (max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tile{padding:14px 16px;border-right:1px solid var(--line)}
+.tile:last-child{border-right:0}
+.tile .v{font-size:28px;font-weight:600;line-height:1.1;letter-spacing:-.01em}
+.tile .l{font-size:12px;color:var(--muted);margin-top:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);border-radius:999px;padding:3px 11px;cursor:pointer;font-size:12.5px;color:var(--fg2);background:none;user-select:none;display:inline-flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--fg);color:var(--fg)}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip .sw{width:9px;height:9px;border-radius:2px;display:inline-block;border:1px solid var(--line2)}
+select{border:1px solid var(--line2);background:var(--bg);border-radius:6px;padding:6px 10px}
+input.f{border:1px solid var(--line2);background:var(--bg);border-radius:6px;padding:6px 10px;min-width:220px;outline:none}
+input.f:focus{border-color:var(--fg)}
+.btn{border:1px solid var(--line2);background:none;border-radius:6px;padding:6px 12px;cursor:pointer;color:var(--fg2)}
+.btn:hover{border-color:var(--fg);color:var(--fg)}
+/* tables */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none}
+th.on{color:var(--fg)}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.rw{cursor:pointer}
+tr.rw:hover{background:var(--hover)}
+td .t2{display:block;font-size:12px;color:var(--muted)}
+.mini{display:flex;height:6px;width:120px;background:var(--na);border-radius:3px;overflow:hidden;gap:1px}
+.mini span{display:block;height:100%}
+.badge{display:inline-block;min-width:30px;text-align:center;border-radius:4px;padding:1px 6px;font-size:11.5px;font-weight:600;line-height:1.5;border:1px solid transparent;vertical-align:middle}
+.badge.Q1{background:var(--q1);color:var(--bg)}.badge.Q2{background:var(--q2);color:var(--bg)}
+.badge.Q3{background:var(--q3);color:var(--onq3)}.badge.Q4{background:var(--q4);color:var(--onq4)}
+.badge.u{background:none;border-color:var(--line2);color:var(--fg2)}
+.badge.na{background:none;border-color:var(--line);color:var(--muted);border-style:dashed}
+/* lists */
+.pub{padding:12px 0;border-bottom:1px solid var(--line)}
+.pub .t{font-weight:500}
+.pub .m{color:var(--muted);font-size:12.5px;margin-top:2px}
+.pub .m b{color:var(--fg2);font-weight:500}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.kv .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.links{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--fg2)}
+.note{font-size:12.5px;color:var(--muted);line-height:1.6}
+.warn{color:var(--fg2);border:1px solid var(--line2);border-radius:6px;padding:8px 12px;font-size:13px;display:inline-block}
+.empty{color:var(--muted);padding:30px 0;text-align:center}
+/* charts */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:6px;vertical-align:-1px;border:1px solid var(--line2)}
+svg text{fill:var(--muted);font-size:11px}
+svg .tot{fill:var(--fg);font-weight:600}
+svg .in{font-size:10.5px;font-weight:600;font-variant-numeric:tabular-nums}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg .axis{stroke:var(--line2);stroke-width:1}
+svg .seg,svg .pt{cursor:pointer}
+svg .seg:hover{opacity:.85}
+svg .ln{fill:none;stroke:var(--fg);stroke-width:2}
+.tip{position:fixed;pointer-events:none;background:var(--fg);color:var(--bg);border-radius:6px;padding:6px 10px;font-size:12px;display:none;z-index:20;max-width:320px;line-height:1.4}
+.back{color:var(--muted);border:0;font-size:13px}
+.back:hover{color:var(--fg)}
+.more{margin-top:14px}
+footer{border-top:1px solid var(--line);margin-top:48px;padding:18px 0;color:var(--muted);font-size:12.5px;line-height:1.6}
+@media print{header .search,.theme,.btn{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <div class="brand">Research Pulse<small id="brandSub"></small></div>
+  <nav id="nav">
+    <a href="#/overview" data-r="overview">Overview</a>
+    <a href="#/faculty" data-r="faculty">Faculty</a>
+    <a href="#/journals" data-r="journals">Journals</a>
+    <a href="#/new" data-r="new">What's new</a>
+  </nav>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search a professor" autocomplete="off" aria-label="Search a professor">
+    <kbd>/</kbd>
+    <div class="dd" id="dd"></div>
+  </div>
+  <button class="theme" id="theme" title="Light / dark">&#9681;</button>
+</div></header>
+<main class="wrap" id="main"></main>
+<footer class="wrap" id="foot"></footer>
+<div class="tip" id="tip"></div>
+
+<script id="data" type="application/json">__DATA_JSON__</script>
+<script>
+'use strict';
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const FAC = new Map(DATA.faculty.map(f => [f.slug, f]));
+const PUBS = DATA.pubs.filter(p => FAC.has(p.f));
+PUBS.forEach(p => { p.fac = FAC.get(p.f); if (p.s === 'Indexed, no quartile') p.s = 'Unranked'; });
+const SERIES = ['Q1','Q2','Q3','Q4','Unranked'];
+const LABEL = {Q1:'Q1',Q2:'Q2',Q3:'Q3',Q4:'Q4',Unranked:'Unranked journal','Not applicable':'Non-journal'};
+const COLOR = {Q1:'var(--q1)',Q2:'var(--q2)',Q3:'var(--q3)',Q4:'var(--q4)',Unranked:'var(--unr)'};
+const INK = {Q1:'var(--bg)',Q2:'var(--bg)',Q3:'var(--onq3)',Q4:'var(--onq4)',Unranked:'var(--fg)'};   // text colour on each fill
+const THIS_YEAR = parseInt(DATA.generated.slice(0,4), 10);
+const PERIODS = [['all','All time'],['10','Last 10 years'],['5','Last 5 years'],['3','Last 3 years'],['ytd','This year']];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => (n ?? 0).toLocaleString('en-US');
+const pct = (a,b) => b ? Math.round(100*a/b) + '%' : '–';
+const uniq = ps => { const s = new Set(); return ps.filter(p => !s.has(p.k) && s.add(p.k)); };
+const count = (ps, fn) => ps.reduce((m,p) => { const k = fn(p); m[k] = (m[k]||0)+1; return m; }, {});
+const yearFrom = per => per === 'all' ? -Infinity : per === 'ytd' ? THIS_YEAR : THIS_YEAR - parseInt(per,10) + 1;
+const inPeriod = (p, per) => per === 'all' || (p.y != null && p.y >= yearFrom(per));
+const isJournal = p => p.s !== 'Not applicable';
+const state = { period: 'all',
+  fac: { q:'', dept:'', cat:'', sort:'q12', dir:-1 },
+  jr: { q:'', sort:'papers', dir:-1, qs:new Set(['Q1','Q2','Q3','Q4','Unranked']), open:null },
+  prof: { q:'', chips:new Set(['Q1','Q2','Q3','Q4','Unranked','Not applicable']), sort:'year', shown:100 },
+  nw: { days:30, shown:100 } };
+try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch(e){}
+$('#theme').onclick = () => { const r = document.documentElement; const dark = r.dataset.theme === 'dark' || (!r.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches); r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem('theme', r.dataset.theme); } catch(e){} };
+$('#brandSub').textContent = 'AKSOB · ' + DATA.university;
+
+// ------------------------------------------------------------- stats
+function stats(ps){
+  const c = count(ps, p => p.s);
+  const q1=c.Q1||0,q2=c.Q2||0,q3=c.Q3||0,q4=c.Q4||0,unr=c.Unranked||0,na=c['Not applicable']||0;
+  const journal = q1+q2+q3+q4+unr;
+  return { total: ps.length, q1,q2,q3,q4,unr,na, journal, q12:q1+q2, share: journal ? Math.round(100*(q1+q2)/journal) : null, cites: ps.reduce((s,p)=>s+(p.c||0),0) };
+}
+const facPubs = (slug, per) => PUBS.filter(p => p.f === slug && inPeriod(p, per));
+function byYear(ps){ const m = {}; ps.forEach(p => { if (p.y && isJournal(p)) (m[p.y] ||= []).push(p); }); return Object.keys(m).map(Number).sort().map(y => ({label:String(y), counts:count(m[y], p=>p.s), total:m[y].length, pubs:m[y]})); }
+
+// ------------------------------------------------------------ charts
+const tip = $('#tip');
+document.addEventListener('mousemove', e => { const t = e.target.closest && e.target.closest('[data-tip]'); if (!t) { tip.style.display='none'; return; } tip.innerHTML = t.dataset.tip; tip.style.display='block'; const x = Math.min(e.clientX+14, innerWidth - tip.offsetWidth - 10); tip.style.left = x+'px'; tip.style.top = (e.clientY+16)+'px'; });
+const legend = () => `<div class="legend">${SERIES.map(s => `<span><i style="background:${COLOR[s]}"></i>${LABEL[s]}</span>`).join('')}</div>`;
+function stackedBars(el, rows, aria){
+  if (!rows.length) { el.innerHTML = '<div class="empty">No journal articles in this period</div>'; return; }
+  const W = Math.max(320, el.clientWidth || 600), pl = 34, pr = 8, pb = 24, pw = W-pl-pr;
+  const bw = pw / rows.length, narrow = bw < 15;            // narrow bars get their totals written vertically
+  const H = narrow ? 262 : 230, pt = narrow ? 42 : 18, ph = H-pt-pb;
+  const max = Math.max(1, ...rows.map(r => r.total));
+  let s = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(aria)}">`;
+  for (let t = 0; t <= 4; t++){ const y = pt + ph - ph*t/4; s += `<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/><text x="${pl-6}" y="${y+4}" text-anchor="end">${Math.round(max*t/4)}</text>`; }
+  rows.forEach((r,i) => { const x = pl + i*bw + bw*0.18, w = Math.max(3, bw*0.64); let y = pt + ph;
+    SERIES.forEach(k => { const n = r.counts[k]||0; if (!n) return; const h = ph*n/max; y -= h;
+      s += `<rect class="seg" x="${x}" y="${y}" width="${w}" height="${Math.max(0,h-1.5)}" rx="2" fill="${COLOR[k]}" data-tip="<b>${esc(r.label)}</b><br>${n} ${LABEL[k]} of ${r.total}"/>`;
+      if (h >= 13 && w >= 22) s += `<text class="in" x="${x+w/2}" y="${y+h/2+3.5}" text-anchor="middle" fill="${INK[k]}" pointer-events="none">${n}</text>`; });
+    const top = pt + ph - ph*r.total/max;
+    if (!narrow) s += `<text class="tot" x="${x+w/2}" y="${top-4}" text-anchor="middle" style="font-size:${bw < 26 ? 9.5 : 11}px">${r.total}</text>`;
+    else s += `<text class="tot" transform="rotate(-90 ${x+w/2} ${top-4})" x="${x+w/2}" y="${top-4+3.5}" text-anchor="start" style="font-size:9.5px">${r.total}</text>`;
+    const every = Math.ceil(rows.length / Math.floor(pw/44));
+    if (i % every === 0 || i === rows.length-1) s += `<text x="${x+w/2}" y="${H-7}" text-anchor="middle">${esc(r.label)}</text>`; });
+  s += `<line class="axis" x1="${pl}" x2="${W-pr}" y1="${pt+ph}" y2="${pt+ph}"/></svg>`;
+  el.innerHTML = s;
+}
+function lineChart(el, pts, aria){
+  const valid = pts.filter(p => p.v != null);
+  if (valid.length < 2) { el.innerHTML = '<div class="empty">Not enough years to draw a trend</div>'; return; }
+  const W = Math.max(320, el.clientWidth || 600), H = 230, pl = 36, pr = 10, pt = 14, pb = 24, pw = W-pl-pr, ph = H-pt-pb;
+  const X = i => pl + (pts.length === 1 ? pw/2 : pw * i/(pts.length-1)); const Y = v => pt + ph - ph*v/100;
+  let s = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(aria)}">`;
+  for (let t = 0; t <= 4; t++){ const y = Y(25*t); s += `<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/><text x="${pl-6}" y="${y+4}" text-anchor="end">${25*t}%</text>`; }
+  s += `<polyline class="ln" points="${pts.map((p,i) => p.v == null ? null : `${X(i)},${Y(p.v)}`).filter(Boolean).join(' ')}"/>`;
+  pts.forEach((p,i) => { if (p.v == null) return; s += `<circle class="pt" cx="${X(i)}" cy="${Y(p.v)}" r="4" fill="var(--bg)" stroke="var(--fg)" stroke-width="2" data-tip="<b>${esc(p.label)}</b><br>${p.v}% Q1+Q2 (${p.n} ranked articles)"/>`;
+    const every = Math.ceil(pts.length / Math.floor(pw/44)); if (i % every === 0 || i === pts.length-1) s += `<text x="${X(i)}" y="${H-7}" text-anchor="middle">${esc(p.label)}</text>`; });
+  s += `<line class="axis" x1="${pl}" x2="${W-pr}" y1="${pt+ph}" y2="${pt+ph}"/></svg>`;
+  el.innerHTML = s;
+}
+function mini(st){ const tot = st.journal || 1; return `<div class="mini" title="Q1 ${st.q1} · Q2 ${st.q2} · Q3 ${st.q3} · Q4 ${st.q4} · unranked ${st.unr}">${['q1','q2','q3','q4','unr'].map((k,i) => `<span style="width:${100*st[k]/tot}%;background:${COLOR[SERIES[i]]}"></span>`).join('')}</div>`; }
+const badge = p => p.q ? `<span class="badge ${p.q}">${p.q}</span>` : p.s === 'Not applicable' ? `<span class="badge na">n/a</span>` : `<span class="badge u">–</span>`;
+const periodChips = () => `<div class="chips" id="per">${PERIODS.map(([k,l]) => `<span class="chip ${state.period===k?'on':''}" data-k="${k}">${l}</span>`).join('')}</div>`;
+function bindPeriod(){ const el = $('#per'); if (!el) return; el.onclick = e => { const c = e.target.closest('.chip'); if (!c) return; state.period = c.dataset.k; render(); }; }
+const sortIcon = (st, k) => st.sort === k ? (st.dir > 0 ? ' ▲' : ' ▼') : '';
+function thead(cols, st){ return '<thead><tr>' + cols.map(c => `<th class="${c.num?'num':''} ${st.sort===c.k?'on':''}" data-k="${c.k}">${c.l}${sortIcon(st,c.k)}</th>`).join('') + '</tr></thead>'; }
+function bindSort(table, st, cols, re){ table.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; const c = cols.find(x => x.k === k); if (st.sort === k) st.dir *= -1; else { st.sort = k; st.dir = c && c.num ? -1 : 1; } re(); }); }
+function sortBy(rows, st){ return rows.sort((a,b) => { const x = a[st.sort], y = b[st.sort]; if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * st.dir; }); }
+
+// ------------------------------------------------------------ search
+const qi = $('#q'), dd = $('#dd'); let hi = -1;
+function matches(q){ q = q.trim().toLowerCase(); if (!q) return []; return DATA.faculty.filter(f => f.name.toLowerCase().includes(q) || f.dept.toLowerCase().includes(q)).sort((a,b) => a.name.toLowerCase().startsWith(q) === b.name.toLowerCase().startsWith(q) ? a.name.localeCompare(b.name) : (a.name.toLowerCase().startsWith(q) ? -1 : 1)).slice(0, 8); }
+function showDD(){ const m = matches(qi.value); dd.innerHTML = m.map((f,i) => `<div data-s="${esc(f.slug)}" class="${i===hi?'hi':''}"><span>${esc(f.name)}</span><small>${esc(f.dept)}</small></div>`).join(''); dd.classList.toggle('open', m.length > 0); }
+qi.addEventListener('input', () => { hi = -1; showDD(); });
+qi.addEventListener('keydown', e => { const items = dd.querrySelectorAll ? [] : dd.querySelectorAll('div'); if (e.key === 'ArrowDown') { hi = Math.min(hi+1, items.length-1); showDD(); e.preventDefault(); } else if (e.key === 'ArrowUp') { hi = Math.max(hi-1, 0); showDD(); e.preventDefault(); } else if (e.key === 'Enter') { const pick = items[hi >= 0 ? hi : 0]; if (pick) go('#/faculty/' + pick.dataset.s); } else if (e.key === 'Escape') { dd.classList.remove('open'); qi.blur(); } });
+dd.addEventListener('mousedown', e => { const d = e.target.closest('div[data-s]'); if (d) go('#/faculty/' + d.dataset.s); });
+document.addEventListener('click', e => { if (!e.target.closest('.search')) dd.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === '/' && document.activeElement !== qi && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); qi.focus(); qi.select(); } });
+function go(h){ dd.classList.remove('open'); qi.value = ''; location.hash = h; }
+
+// ------------------------------------------------------------- views
+function viewOverview(){
+  const per = state.period; const ps = PUBS.filter(p => inPeriod(p, per)); const u = uniq(ps); const st = stats(u);
+  const thisYear = uniq(PUBS.filter(p => p.y === THIS_YEAR)).length;
+  const q1Fac3 = new Set(PUBS.filter(p => p.q === 'Q1' && p.y >= THIS_YEAR-2).map(p => p.f)).size;
+  const covered = DATA.faculty.filter(f => f.covered).length;
+  const depts = {}; ps.forEach(p => (depts[p.fac.dept] ||= new Map()).set(p.k, p));
+  const drows = Object.keys(depts).sort().map(d => { const dp = [...depts[d].values()]; const s = stats(dp); return {d, n: DATA.faculty.filter(f => f.dept === d).length, ...s}; });
+  const facStats = DATA.faculty.map(f => ({f, ...stats(facPubs(f.slug, per))})).filter(r => r.total);
+  const topQ1 = facStats.slice().sort((a,b) => b.q1 - a.q1 || b.q12 - a.q12).slice(0, 10);
+  const jr = {}; u.forEach(p => { if (p.j && isJournal(p)) { const g = (jr[p.j] ||= {n:0, q:'', y:0}); g.n++; if ((p.y||0) >= g.y) { g.y = p.y||0; g.q = p.q; } } });
+  const topJ = Object.entries(jr).sort((a,b) => b[1].n - a[1].n).slice(0, 10);
+  const years = byYear(u); const trend = years.map(r => { const ranked = (r.counts.Q1||0)+(r.counts.Q2||0)+(r.counts.Q3||0)+(r.counts.Q4||0); return {label:r.label, n:ranked, v: ranked >= 3 ? Math.round(100*((r.counts.Q1||0)+(r.counts.Q2||0))/ranked) : null}; });
+  $('#main').innerHTML = `
+    <div class="row between"><div><h1>Research output</h1><div class="sub">${esc(DATA.school)}, ${esc(DATA.university)} · ${fmt(DATA.faculty.length)} faculty · updated ${esc(DATA.generated.slice(0,10))}</div></div>${periodChips()}</div>
+    <div class="sec tiles">
+      <div class="tile"><div class="v">${fmt(u.length)}</div><div class="l">Publications</div></div>
+      <div class="tile"><div class="v">${fmt(st.q1)}</div><div class="l">Q1 articles</div></div>
+      <div class="tile"><div class="v">${fmt(st.q2)}</div><div class="l">Q2 articles</div></div>
+      <div class="tile"><div class="v">${st.share == null ? '–' : st.share + '%'}</div><div class="l">Q1+Q2 share of journal items</div></div>
+      <div class="tile"><div class="v">${fmt(thisYear)}</div><div class="l">Published in ${THIS_YEAR}</div></div>
+      <div class="tile"><div class="v">${fmt(q1Fac3)}</div><div class="l">Faculty with a Q1 paper since ${THIS_YEAR-2}</div></div>
+    </div>
+    <div class="sec grid2">
+      <div><h2>Journal articles per year</h2>${legend()}<div id="c1"></div></div>
+      <div><h2>Q1+Q2 share of ranked articles</h2><div class="note" style="margin-bottom:8px">Years with fewer than 3 ranked articles are skipped.</div><div id="c2"></div></div>
+    </div>
+    <div class="sec"><h2>Departments</h2><table id="dept">${thead([{k:'d',l:'Department'},{k:'n',l:'Faculty',num:1},{k:'total',l:'Publications',num:1},{k:'q1',l:'Q1',num:1},{k:'q2',l:'Q2',num:1},{k:'q3',l:'Q3',num:1},{k:'q4',l:'Q4',num:1},{k:'unr',l:'Unranked',num:1},{k:'na',l:'Non-journal',num:1},{k:'share',l:'Q1+Q2 %',num:1},{k:'mix',l:''}], {sort:'',dir:1})}<tbody>${drows.map(r => `<tr class="rw" data-d="${esc(r.d)}"><td>${esc(r.d)}</td><td class="num">${r.n}</td><td class="num">${fmt(r.total)}</td><td class="num">${r.q1}</td><td class="num">${r.q2}</td><td class="num">${r.q3}</td><td class="num">${r.q4}</td><td class="num">${r.unr}</td><td class="num">${r.na}</td><td class="num">${r.share==null?'–':r.share+'%'}</td><td>${mini(r)}</td></tr>`).join('')}</tbody></table>
+      <div class="note" style="margin-top:8px">A paper co-authored by two AKSOB faculty counts once per department here and once per person in the Faculty tab.</div></div>
+    <div class="sec grid2">
+      <div><h2>Most Q1 articles · ${esc(PERIODS.find(x=>x[0]===per)[1].toLowerCase())}</h2>${topQ1.length ? topQ1.map(r => `<a class="kv" href="#/faculty/${esc(r.f.slug)}" style="border-bottom:1px solid var(--line)"><span>${esc(r.f.name)} <span class="sub">· ${esc(r.f.dept)}</span></span><span class="n">${r.q1} Q1 · ${r.q12} Q1+Q2</span></a>`).join('') : '<div class="empty">Nothing yet</div>'}</div>
+      <div><h2>Journals we publish in most</h2>${topJ.length ? topJ.map(([j,g]) => `<div class="kv"><span>${badge({q:g.q, s:'x'})} ${esc(j)}</span><span class="n">${g.n}</span></div>`).join('') : '<div class="empty">Nothing yet</div>'}<div class="note" style="margin-top:8px"><a href="#/journals">All journals</a></div></div>
+    </div>`;
+  bindPeriod();
+  stackedBars($('#c1'), years, 'Journal articles per year by quartile');
+  lineChart($('#c2'), trend, 'Share of Q1 and Q2 articles per year');
+  $('#dept').querySelectorAll('tr.rw').forEach(tr => tr.onclick = () => { state.fac.dept = tr.dataset.d; location.hash = '#/faculty'; });
+  $('#main').dataset.redraw = 'overview';
+}
+
+function viewFaculty(){
+  const st = state.fac; const per = state.period;
+  const depts = [...new Set(DATA.faculty.map(f => f.dept))].sort(); const cats = [...new Set(DATA.faculty.map(f => f.cat))].sort();
+  let rows = DATA.faculty.filter(f => (!st.dept || f.dept === st.dept) && (!st.cat || f.cat === st.cat) && (!st.q || f.name.toLowerCase().includes(st.q)))
+    .map(f => { const s = stats(facPubs(f.slug, per)); return {slug:f.slug, name:f.name, dept:f.dept, cat:f.cat, title:f.title, covered:f.covered, coverage:f.coverage, cites: per==='all' ? f.cites : s.cites, h:f.h, ...s}; });
+  const cols = [{k:'name',l:'Faculty'},{k:'dept',l:'Department'},{k:'total',l:'Papers',num:1},{k:'q1',l:'Q1',num:1},{k:'q2',l:'Q2',num:1},{k:'q3',l:'Q3',num:1},{k:'q4',l:'Q4',num:1},{k:'q12',l:'Q1+Q2',num:1},{k:'share',l:'Q1+Q2 %',num:1},{k:'mix',l:''},{k:'cites',l:'Citations',num:1},{k:'h',l:'h-index',num:1}];
+  sortBy(rows, st);
+  // people with papers first, then covered people with none in this period, then people with no source at all
+  const group = r => r.covered ? (r.total ? 0 : 1) : 2;
+  rows = rows.map((r, i) => [group(r), i, r]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2]);
+  $('#main').innerHTML = `
+    <div class="row between"><div><h1>Faculty</h1><div class="sub">${rows.length} of ${DATA.faculty.length} shown · click a name for the full profile · click a column to sort</div></div>${periodChips()}</div>
+    <div class="sec row">
+      <input class="f" id="fq" placeholder="Filter by name" value="${esc(st.q)}">
+      <select id="fd"><option value="">All departments</option>${depts.map(d => `<option ${st.dept===d?'selected':''}>${esc(d)}</option>`).join('')}</select>
+      <select id="fc"><option value="">All categories</option>${cats.map(c => `<option ${st.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</select>
+      <select id="fs">${cols.filter(c => c.k !== 'mix').map(c => `<option value="${c.k}" ${st.sort===c.k?'selected':''}>Sort: ${c.l}</option>`).join('')}</select>
+      <button class="btn" id="fdir" title="Toggle direction">${st.dir > 0 ? 'Ascending' : 'Descending'}</button>
+    </div>
+    <div class="sec"><table id="ft">${thead(cols, st)}<tbody>${rows.map(r => `<tr class="rw" data-s="${esc(r.slug)}">
+      <td>${esc(r.name)}${r.covered ? '' : ' <span title="' + esc(r.coverage) + '">&#9888;</span>'}<span class="t2">${esc(r.title || r.cat)}</span></td><td>${esc(r.dept)}</td>
+      <td class="num">${r.total}</td><td class="num">${r.q1}</td><td class="num">${r.q2}</td><td class="num">${r.q3}</td><td class="num">${r.q4}</td><td class="num"><b>${r.q12}</b></td><td class="num">${r.share==null?'–':r.share+'%'}</td><td>${mini(r)}</td><td class="num">${r.cites==null?'–':fmt(r.cites)}</td><td class="num">${r.h==null?'–':r.h}</td></tr>`).join('')}</tbody></table>
+      ${rows.length ? '' : '<div class="empty">No faculty match these filters</div>'}
+      <div class="note" style="margin-top:8px">&#9888; marks faculty with no OpenAlex record, ORCID or Scholar export yet, so their counts are empty rather than zero. Citations and h-index are lifetime figures from OpenAlex; they are lower than Google Scholar's, which also counts citations from theses, books and working papers.</div></div>`;
+  bindPeriod();
+  const re = () => viewFaculty();
+  $('#fq').oninput = e => { st.q = e.target.value.trim().toLowerCase(); re(); const i = $('#fq'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); };
+  $('#fd').onchange = e => { st.dept = e.target.value; re(); };
+  $('#fc').onchange = e => { st.cat = e.target.value; re(); };
+  $('#fs').onchange = e => { st.sort = e.target.value; st.dir = cols.find(c => c.k === st.sort).num ? -1 : 1; re(); };
+  $('#fdir').onclick = () => { st.dir *= -1; re(); };
+  bindSort($('#ft'), st, cols, re);
+  $('#ft').querySelectorAll('tr.rw').forEach(tr => tr.onclick = () => location.hash = '#/faculty/' + tr.dataset.s);
+}
+
+function coauthors(f, ps){
+  const me = f.name.toLowerCase().split(/\s+/).pop(); const m = {};
+  ps.forEach(p => (p.a || '').split(/,|;| and /).map(s => s.trim()).filter(s => s && s.length > 2).forEach(a => { if (a.toLowerCase().includes(me)) return; const k = a.replace(/\./g,'').replace(/\s+/g,' '); m[k] = (m[k]||0)+1; }));
+  return Object.entries(m).sort((a,b) => b[1]-a[1]).slice(0, 10);
+}
+function viewProfile(slug){
+  const f = FAC.get(slug); if (!f) { $('#main').innerHTML = '<div class="empty">Unknown faculty member</div>'; return; }
+  const st = state.prof; const all = PUBS.filter(p => p.f === slug); const s = stats(all);
+  const years = byYear(all);
+  const jr = {}; all.forEach(p => { if (p.j && isJournal(p)) { const g = (jr[p.j] ||= {n:0,q:'',y:0}); g.n++; if ((p.y||0) >= g.y) { g.y = p.y||0; g.q = p.q; } } });
+  const topJ = Object.entries(jr).sort((a,b) => b[1].n-a[1].n).slice(0, 8);
+  const co = coauthors(f, all);
+  let list = all.filter(p => st.chips.has(p.s) && (!st.q || (p.t+' '+p.j+' '+p.a).toLowerCase().includes(st.q)));
+  const qrank = {Q1:1,Q2:2,Q3:3,Q4:4,Unranked:5,'Not applicable':6};
+  list.sort((a,b) => st.sort === 'cites' ? (b.c-a.c) || (b.y||0)-(a.y||0) : st.sort === 'q' ? (qrank[a.s]-qrank[b.s]) || (b.y||0)-(a.y||0) : ((b.y||0)-(a.y||0)) || (b.c-a.c));
+  const shown = list.slice(0, st.shown);
+  const links = [f.url && `<a href="${esc(f.url)}" target="_blank" rel="noopener">LAU profile</a>`, f.openalex && `<a href="https://openalex.org/authors/${esc(f.openalex)}" target="_blank" rel="noopener">OpenAlex</a>`, f.orcid && `<a href="https://orcid.org/${esc(f.orcid)}" target="_blank" rel="noopener">ORCID</a>`, f.scholar && `<a href="https://scholar.google.com/citations?user=${esc(f.scholar)}" target="_blank" rel="noopener">Google Scholar</a>`, `<a href="#" id="copy">Copy link</a>`, `<a href="#" id="csv">Download CSV</a>`].filter(Boolean).join('');
+  $('#main').innerHTML = `
+    <a class="back" href="#/faculty">&larr; All faculty</a>
+    <div class="row between" style="margin-top:10px;align-items:flex-start"><div><h1>${esc(f.name)}</h1><div class="sub">${esc([f.title, f.dept, f.cat].filter(Boolean).join(' · '))}</div></div><div class="links">${links}</div></div>
+    ${f.covered ? '' : `<div class="sec warn">&#9888; No publication source yet for this person: ${esc(f.coverage)}</div>`}
+    <div class="sec tiles">
+      <div class="tile"><div class="v">${fmt(s.total)}</div><div class="l">Publications</div></div>
+      <div class="tile"><div class="v">${s.q1}</div><div class="l">Q1</div></div>
+      <div class="tile"><div class="v">${s.q2}</div><div class="l">Q2</div></div>
+      <div class="tile"><div class="v">${s.q3 + s.q4}</div><div class="l">Q3 + Q4</div></div>
+      <div class="tile"><div class="v">${s.share == null ? '–' : s.share + '%'}</div><div class="l">Q1+Q2 share of journal items</div></div>
+      <div class="tile"><div class="v">${f.cites == null ? '–' : fmt(f.cites)}</div><div class="l">Citations${f.msrc ? ' · ' + esc(f.msrc) : ''}</div></div>
+      <div class="tile"><div class="v">${f.h == null ? '–' : f.h}</div><div class="l">h-index</div></div>
+    </div>
+    <div class="sec grid3">
+      <div><h2>Journal articles per year</h2>${legend()}<div id="c1"></div></div>
+      <div><h2>Top journals</h2>${topJ.length ? topJ.map(([j,g]) => `<div class="kv"><span>${badge({q:g.q,s:'x'})} ${esc(j)}</span><span class="n">${g.n}</span></div>`).join('') : '<div class="empty">None</div>'}</div>
+      <div><h2>Frequent co-authors</h2>${co.length ? co.map(([a,n]) => `<div class="kv"><span>${esc(a)}</span><span class="n">${n}</span></div>`).join('') : '<div class="empty">None</div>'}</div>
+    </div>
+    <div class="sec">
+      <div class="row between"><h2 style="margin:0">Publications <span class="sub" style="text-transform:none;letter-spacing:0;font-weight:400">${list.length}${list.length !== all.length ? ' of ' + all.length : ''}</span></h2>
+        <div class="row"><input class="f" id="pq" placeholder="Search title, journal, co-author" value="${esc(st.q)}">
+        <select id="ps"><option value="year" ${st.sort==='year'?'selected':''}>Newest first</option><option value="cites" ${st.sort==='cites'?'selected':''}>Most cited</option><option value="q" ${st.sort==='q'?'selected':''}>Best quartile first</option></select></div></div>
+      <div class="chips" style="margin:12px 0 4px" id="pchips">${['Q1','Q2','Q3','Q4','Unranked','Not applicable'].map(k => `<span class="chip ${st.chips.has(k)?'on':''}" data-k="${k}">${LABEL[k]} <span class="sub">${s[k==='Unranked'?'unr':k==='Not applicable'?'na':k.toLowerCase()]}</span></span>`).join('')}</div>
+      <div id="plist">${shown.map(p => `<div class="pub"><div class="t">${p.doi ? `<a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>` : esc(p.t)}</div>
+        <div class="m">${esc(p.a)}</div>
+        <div class="m">${badge(p)} <b>${esc(p.j || (p.ty ? p.ty : 'venue unknown'))}</b>${p.y ? ' · ' + p.y : ''}${p.sjr ? ' · SJR ' + p.sjr : ''}${p.abdc ? ' · ABDC ' + esc(p.abdc) : ''}${p.c ? ' · ' + fmt(p.c) + ' citations' : ''}${f.gsimp && !p.gs ? ' · <span title="Found by the indexes but not in the Google Scholar export">not in Scholar export</span>' : ''}</div></div>`).join('')}
+        ${list.length ? '' : '<div class="empty">No publications match</div>'}</div>
+      ${list.length > shown.length ? `<div class="more"><button class="btn" id="pmore">Show ${Math.min(200, list.length - shown.length)} more</button></div>` : ''}
+    </div>
+    <div class="sec note">Sources for this person: ${esc(f.coverage.replace(/^OK - /, ''))}${f.fetched ? ' · last refreshed ' + esc(f.fetched) : ''}. Quartiles are Scimago (SJR) best quartile for the paper's publication year.</div>`;
+  stackedBars($('#c1'), years, 'Journal articles per year by quartile');
+  const re = () => viewProfile(slug);
+  $('#pq').oninput = e => { st.q = e.target.value.trim().toLowerCase(); st.shown = 100; re(); const i = $('#pq'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); };
+  $('#ps').onchange = e => { st.sort = e.target.value; re(); };
+  $('#pchips').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; const k = c.dataset.k; st.chips.has(k) ? st.chips.delete(k) : st.chips.add(k); re(); };
+  const more = $('#pmore'); if (more) more.onclick = () => { st.shown += 200; re(); };
+  $('#copy').onclick = e => { e.preventDefault(); navigator.clipboard && navigator.clipboard.writeText(location.href); e.target.textContent = 'Link copied'; };
+  $('#csv').onclick = e => { e.preventDefault(); downloadCsv(list, `${f.slug}_publications.csv`); };
+  $('#main').dataset.redraw = 'profile:' + slug;
+}
+
+function viewJournals(){
+  const st = state.jr; const per = state.period;
+  const groups = {}; uniq(PUBS.filter(p => inPeriod(p, per) && isJournal(p) && p.j)).forEach(p => { const g = (groups[p.j] ||= {j:p.j, papers:0, q:'', y:0, sjr:null, abdc:'', cat:'', authors:new Set(), pubs:[]}); g.papers++; g.pubs.push(p); if ((p.y||0) >= g.y) { g.y = p.y||0; g.q = p.q; g.sjr = p.sjr; g.abdc = p.abdc; g.cat = p.cat; } });
+  PUBS.forEach(p => { if (groups[p.j] && inPeriod(p, per)) groups[p.j].authors.add(p.fac.name); });
+  let rows = Object.values(groups).map(g => ({...g, s: g.q || 'Unranked', nauth: g.authors.size, qr: {Q1:1,Q2:2,Q3:3,Q4:4}[g.q] || 5}))
+    .filter(g => st.qs.has(g.s) && (!st.q || g.j.toLowerCase().includes(st.q)));
+  const cols = [{k:'j',l:'Journal'},{k:'qr',l:'Quartile',num:1},{k:'sjr',l:'SJR',num:1},{k:'abdc',l:'ABDC'},{k:'papers',l:'Papers',num:1},{k:'nauth',l:'AKSOB authors',num:1}];
+  sortBy(rows, st);
+  $('#main').innerHTML = `
+    <div class="row between"><div><h1>Journals</h1><div class="sub">${rows.length} journals · where the school publishes · click a journal to see the papers</div></div>${periodChips()}</div>
+    <div class="sec row"><input class="f" id="jq" placeholder="Filter journals" value="${esc(st.q)}">
+      <div class="chips" id="jchips">${SERIES.map(k => `<span class="chip ${st.qs.has(k)?'on':''}" data-k="${k}"><i class="sw" style="background:${COLOR[k]}"></i>${LABEL[k]}</span>`).join('')}</div></div>
+    <div class="sec"><table id="jt">${thead(cols, st)}<tbody>${rows.map(g => `<tr class="rw" data-j="${esc(g.j)}"><td>${esc(g.j)}${g.cat ? `<span class="t2">${esc(g.cat)}</span>` : ''}</td><td class="num">${badge({q:g.q, s:g.q?'x':'Unranked'})}</td><td class="num">${g.sjr ?? ''}</td><td>${esc(g.abdc)}</td><td class="num">${g.papers}</td><td class="num">${g.nauth}</td></tr>${st.open === g.j ? `<tr><td colspan="6" style="background:var(--hover)">${g.pubs.sort((a,b)=>(b.y||0)-(a.y||0)).map(p => `<div class="pub" style="padding:8px 0"><div class="t">${p.doi ? `<a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>` : esc(p.t)}</div><div class="m">${p.y || ''} · <a href="#/faculty/${esc(p.f)}">${esc(p.fac.name)}</a>${p.c ? ' · ' + fmt(p.c) + ' citations' : ''}</div></div>`).join('')}</td></tr>` : ''}`).join('')}</tbody></table>${rows.length ? '' : '<div class="empty">No journals match</div>'}</div>`;
+  bindPeriod();
+  const re = () => viewJournals();
+  $('#jq').oninput = e => { st.q = e.target.value.trim().toLowerCase(); re(); const i = $('#jq'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); };
+  $('#jchips').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; const k = c.dataset.k; st.qs.has(k) ? st.qs.delete(k) : st.qs.add(k); re(); };
+  bindSort($('#jt'), st, cols, re);
+  $('#jt').querySelectorAll('tr.rw').forEach(tr => tr.onclick = () => { st.open = st.open === tr.dataset.j ? null : tr.dataset.j; re(); });
+}
+
+function viewNew(){
+  const st = state.nw;
+  const dated = PUBS.filter(p => p.fs); const dc = count(dated, p => p.fs);
+  const [baseDate, baseN] = Object.entries(dc).sort((a,b) => b[1]-a[1])[0] || [null, 0];
+  const isBaseline = baseN > dated.length * 0.5;
+  const cutoff = new Date(DATA.generated.slice(0,10)); cutoff.setDate(cutoff.getDate() - st.days);
+  const fresh = uniq(dated.filter(p => (!isBaseline || p.fs > baseDate) && new Date(p.fs) >= cutoff)).sort((a,b) => b.fs.localeCompare(a.fs) || (b.y||0)-(a.y||0));
+  const groups = {}; fresh.forEach(p => (groups[p.fs] ||= []).push(p));
+  const ty = uniq(PUBS.filter(p => p.y === THIS_YEAR)).sort((a,b) => b.c - a.c); const sty = stats(ty);
+  const shown = fresh.slice(0, st.shown);
+  $('#main').innerHTML = `
+    <div class="row between"><div><h1>What's new</h1><div class="sub">Papers the weekly refresh added recently · data updated ${esc(DATA.generated)}</div></div>
+      <div class="chips" id="nchips">${[30,90,365].map(d => `<span class="chip ${st.days===d?'on':''}" data-d="${d}">Last ${d} days</span>`).join('')}</div></div>
+    <div class="sec tiles">
+      <div class="tile"><div class="v">${fmt(fresh.length)}</div><div class="l">Added in the last ${st.days} days</div></div>
+      <div class="tile"><div class="v">${fmt(ty.length)}</div><div class="l">Published in ${THIS_YEAR}</div></div>
+      <div class="tile"><div class="v">${sty.q1}</div><div class="l">Q1 in ${THIS_YEAR}</div></div>
+      <div class="tile"><div class="v">${sty.q2}</div><div class="l">Q2 in ${THIS_YEAR}</div></div>
+      <div class="tile"><div class="v">${DATA.scimago_years.length ? DATA.scimago_years[DATA.scimago_years.length-1] : '–'}</div><div class="l">Latest Scimago edition in use</div></div>
+    </div>
+    ${isBaseline ? `<div class="sec note">The initial import on ${esc(baseDate)} loaded ${fmt(baseN)} items; those are not listed as new. From now on every weekly run adds the papers it finds, and they appear here with the date they were first seen. Scimago publishes a new edition once a year (usually around mid-year); the tracker checks for it weekly and re-ranks everything when it arrives.</div>` : ''}
+    <div class="sec" id="nlist">${Object.keys(groups).length ? Object.entries(groups).map(([d, ps]) => `<h2 style="margin-top:20px">Added ${esc(d)} · ${ps.length}</h2>` + ps.filter(p => shown.includes(p)).map(p => `<div class="pub"><div class="t">${p.doi ? `<a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>` : esc(p.t)}</div><div class="m">${badge(p)} <b>${esc(p.j || p.ty || '')}</b>${p.y ? ' · ' + p.y : ''} · <a href="#/faculty/${esc(p.f)}">${esc(p.fac.name)}</a></div></div>`).join('')).join('') : `<div class="empty">Nothing new in the last ${st.days} days${isBaseline ? '' : ' yet'}.</div>`}</div>
+    ${fresh.length > shown.length ? `<div class="more"><button class="btn" id="nmore">Show more</button></div>` : ''}
+    <div class="sec"><h2>Most cited papers published in ${THIS_YEAR}</h2>${ty.slice(0, 10).map(p => `<div class="pub" style="padding:8px 0"><div class="t">${p.doi ? `<a href="https://doi.org/${esc(p.doi)}" target="_blank" rel="noopener">${esc(p.t)}</a>` : esc(p.t)}</div><div class="m">${badge(p)} <b>${esc(p.j || '')}</b> · <a href="#/faculty/${esc(p.f)}">${esc(p.fac.name)}</a>${p.c ? ' · ' + fmt(p.c) + ' citations' : ''}</div></div>`).join('') || '<div class="empty">Nothing yet this year</div>'}</div>`;
+  $('#nchips').onclick = e => { const c = e.target.closest('.chip'); if (!c) return; st.days = +c.dataset.d; st.shown = 100; viewNew(); };
+  const more = $('#nmore'); if (more) more.onclick = () => { st.shown += 200; viewNew(); };
+}
+
+function downloadCsv(ps, name){
+  const cols = ['faculty','department','year','title','journal','quartile','sjr','abdc','type','citations','doi','authors','scimago_categories','sources'];
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const lines = [cols.join(',')].concat(ps.map(p => [p.fac.name, p.fac.dept, p.y, p.t, p.j, p.q, p.sjr, p.abdc, p.ty, p.c, p.doi, p.a, p.cat, p.src].map(q).join(',')));
+  const blob = new Blob(['﻿' + lines.join('\n')], {type:'text/csv;charset=utf-8'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ------------------------------------------------------------- router
+function render(){
+  const h = location.hash.replace(/^#\/?/, '') || 'overview'; const [route, arg] = h.split('/');
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.r === route));
+  if (route === 'faculty' && arg) viewProfile(decodeURIComponent(arg));
+  else if (route === 'faculty') viewFaculty();
+  else if (route === 'journals') viewJournals();
+  else if (route === 'new') viewNew();
+  else viewOverview();
+  window.scrollTo(0, 0);
+}
+addEventListener('hashchange', render);
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
+$('#foot').innerHTML = `${esc(DATA.school)} · ${esc(DATA.university)} · data updated ${esc(DATA.generated.slice(0,10))} · quartiles: Scimago Journal Rank, edition of each paper's year`;
+render();
+</script>
+</body>
+</html>

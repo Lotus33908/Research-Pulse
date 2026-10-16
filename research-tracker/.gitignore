@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+data/scimago/*.csv
+data/scimago/meta.json
+output/run.log

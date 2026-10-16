@@ -1,0 +1,56 @@
+name: Update AKSOB publications
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"        # every Monday 04:00 UTC
+  workflow_dispatch:           # manual "Run workflow" button in GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: research-tracker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: research-tracker/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cache Scimago yearly rankings
+        uses: actions/cache@v4
+        with:
+          path: research-tracker/data/scimago
+          key: scimago-${{ github.run_number }}
+          restore-keys: scimago-
+
+      - name: Run the pipeline
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          OPENALEX_MAILTO: ${{ secrets.OPENALEX_MAILTO }}
+        run: python -m aksob_pubs run
+
+      - name: Commit refreshed data and reports
+        run: |
+          git config user.name "aksob-research-tracker[bot]"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/faculty.csv data/aksob_pubs.db output/AKSOB_Publications.xlsx output/publications.csv output/dashboard.html ../docs/index.html
+          git diff --cached --quiet && echo "No changes" || git commit -m "Weekly publications refresh ($(date -u +%Y-%m-%d))"
+          git push
+
+      - name: Upload report as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AKSOB_Publications
+          path: |
+            research-tracker/output/AKSOB_Publications.xlsx
+            research-tracker/output/dashboard.html
