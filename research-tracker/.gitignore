@@ -4,3 +4,4 @@ __pycache__/
 data/scimago/*.csv
 data/scimago/meta.json
 output/run.log
+data/faculty_private.csv

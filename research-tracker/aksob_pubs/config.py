@@ -18,6 +18,7 @@ class Config:
     docs_dir: Path
     db_path: Path
     faculty_csv: Path
+    faculty_private_csv: Path             # slug,name,email - git-ignored, never copied into outputs
     overrides_csv: Path
     scimago_dir: Path
     scholar_exports_dir: Path             # drop Google Scholar BibTeX exports here (one file per person)
@@ -56,6 +57,7 @@ def load_config(root: str | os.PathLike | None = None) -> Config:
         docs_dir=docs_dir,
         db_path=Path(os.environ["AKSOB_DB"]) if os.environ.get("AKSOB_DB") else data_dir / "aksob_pubs.db",
         faculty_csv=data_dir / "faculty.csv",
+        faculty_private_csv=data_dir / "faculty_private.csv",
         overrides_csv=data_dir / "journal_overrides.csv",
         scimago_dir=data_dir / "scimago",
         scholar_exports_dir=data_dir / "scholar_exports",

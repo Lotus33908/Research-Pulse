@@ -78,8 +78,8 @@ def parse_profile_page(html: str) -> dict[str, str]:
     out = {"title": "", "email": "", "scholar_id": "", "orcid": ""}
     for a in soup.find_all("a", href=True):
         href = a["href"]
-        if href.startswith("mailto:"):
-            continue                                     # emails are deliberately not stored
+        if href.startswith("mailto:") and not out["email"]:
+            out["email"] = href[7:].split("?")[0].strip().lower()   # goes to the private file only
         m = SCHOLAR_ID_RE.search(href)
         if m and "scholar.google" in href and not out["scholar_id"]:
             out["scholar_id"] = m.group(1)
@@ -102,6 +102,22 @@ def parse_profile_page(html: str) -> dict[str, str]:
                 out["title"] = text
             break
     return out
+
+
+def read_private(path: Path) -> dict[str, str]:
+    """slug -> email, kept in a git-ignored file next to faculty.csv."""
+    if not path.exists():
+        return {}
+    with open(path, newline="", encoding="utf-8-sig") as fh:
+        return {r["slug"]: r.get("email", "") for r in csv.DictReader(fh) if r.get("slug")}
+
+
+def write_private(path: Path, emails: dict[str, str], names: dict[str, str]) -> None:
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["slug", "name", "email"])
+        for slug in sorted(emails, key=lambda s: names.get(s, s)):
+            w.writerow([slug, names.get(slug, ""), emails[slug]])
 
 
 def read_faculty_csv(path: Path) -> dict[str, dict[str, str]]:
@@ -131,6 +147,7 @@ def build_roster(cfg: Config, db: Database, fetch_profiles: bool = True) -> list
     log.info("Found %d people in %d departments", len(people), len({p['department'] for p in people}))
 
     existing = read_faculty_csv(cfg.faculty_csv)
+    emails = read_private(cfg.faculty_private_csv)
     rows: list[dict[str, Any]] = []
     seen = set()
     fetched = 0
@@ -153,7 +170,7 @@ def build_roster(cfg: Config, db: Database, fetch_profiles: bool = True) -> list
         }
         if row["title"].strip().lower() in ("biography", "bio", "about"):
             row["title"] = ""
-        needs_profile = not old or not row["title"]
+        needs_profile = not old or not row["title"] or (is_faculty and not emails.get(p["slug"]))
         if fetch_profiles and is_faculty and needs_profile:   # new people, or details still missing
             try:
                 pr = http.get(p["profile_url"])
@@ -161,6 +178,8 @@ def build_roster(cfg: Config, db: Database, fetch_profiles: bool = True) -> list
                 if pr.ok:
                     info = parse_profile_page(pr.text)
                     row["title"] = row["title"] or info["title"]
+                    if info["email"]:
+                        emails[p["slug"]] = info["email"]
                     row["orcid"] = row["orcid"] or info["orcid"]
                     row["scholar_id"] = row["scholar_id"] or info["scholar_id"]
             except Exception as exc:  # profile pages are nice-to-have
@@ -175,6 +194,7 @@ def build_roster(cfg: Config, db: Database, fetch_profiles: bool = True) -> list
             rows.append(old)
 
     write_faculty_csv(cfg.faculty_csv, rows)
+    write_private(cfg.faculty_private_csv, emails, {r["slug"]: r["name"] for r in rows})
     sync_faculty_to_db(rows, db)
     log.info("Roster written to %s (%d included faculty, %d profile pages read)", cfg.faculty_csv,
              sum(1 for r in rows if str(r.get("include")) == "1" and str(r.get("active")) == "1"), fetched)
